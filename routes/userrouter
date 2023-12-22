@@ -1,29 +1,36 @@
+const e = require('express');
 const express = require('express');
 const router = express.Router();
 const userInfo = require('../data/userinfo');
 
 const firestoreDB = require('../init');
-const userCollection = firestoreDB.collection("users")
+const { READER_COLLECTION } = require('../utils/constants');
+
+const userCollection = firestoreDB.collection(READER_COLLECTION)
 
 // get user profile.
-router.get('/user', async function(req, resp) {
+router.get('/reader', async function(req, resp) {
     const userId = req.query.userId;
     console.log("Getting info for user: " + userId);
     resp.setHeader("Content-Type", "application/json")
     resp.setHeader("Charset", "utf-8")
-    const userDocRef = userCollection.doc(userId).get()
-    userDocRef.then(snapshot => {
-        console.log(snapshot.data())
-        resp.status(200).json({"isSuccess": true, "data": snapshot.data()});
-    }).catch(error => {
-        console.log(error);
-        resp.status(200).json({"isSuccess": false, "message": "Error getting user"});
-    })
+    if(!userId) {
+        console.log("User id not valid: " + userId);
+        resp.status(200).json({"isSuccess": false, "message": "Invalid userId."});
+    } else {
+        const userDocRef = userCollection.doc(userId).get()
+        userDocRef.then(snapshot => {
+            console.log(snapshot.data())
+            resp.status(200).json({"isSuccess": true, "data": snapshot.data()});
+        }).catch(error => {
+            console.log(error);
+            resp.status(200).json({"isSuccess": false, "message": "Error getting user"});
+        })
+    }
 })
 
-router.put('/user/profile/update', async function(req, resp) {
+router.put('/reader/profile/update', async function(req, resp) {
     const userDetails = req.body;
-
     console.log("The request body: " + JSON.stringify(userDetails));
     const userId = userDetails['userId'];
     console.log("Updating user....userId: " + userId);
@@ -39,7 +46,8 @@ router.put('/user/profile/update', async function(req, resp) {
             'connections': userDetails.connections,
             'createdAt': userDetails.createdAt,
             'privacy': userDetails.privacy,
-            'phoneNumber': userDetails.phoneNumber
+            'phoneNumber': userDetails.phoneNumber,
+            'readingStatus': userDetails.userStatus
             }, {merge: true});
         const userDocRef = userCollection.doc(userId).get()
         userDocRef.then(snapshot => {

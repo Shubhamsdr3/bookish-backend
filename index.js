@@ -16,6 +16,8 @@ app.use('/api/bookish', homeFeed);
 const createPost = require('./routes/createpost')
 app.use('/api/bookish', createPost);
 
+const bookInfo = require('./routes/bookrouter')
+app.use('/api/bookish', bookInfo);
 
 //Connecting to DB
 mongoose.connect(process.env.MONGO_URL, {

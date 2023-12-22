@@ -1,6 +1,4 @@
-const { user } = require("firebase-functions/v1/auth")
-
-const userInfo = {
+const readerInfo = {
     "profileIcon": "https://firebasestorage.googleapis.com/v0/b/asli-fitness-389512.appspot.com/o/images%2F1701878083743.jpg?alt=media&token=0eab983e-ffb8-4365-998d-10daea7afc5e",
     "name": "Shubham Pandey",
     "connections": 10000,
@@ -8,4 +6,4 @@ const userInfo = {
     "privacy": 0,
     "phoneNumber": "+91888158678"
 }
-module.exports = userInfo;
+module.exports = readerInfo;
