@@ -23,12 +23,17 @@ bookRouter.get('/reader/book/search', async function(req, res) {
 
 // getting book by id.
 bookRouter.get('/reader/book', async function(req, res) {
-    console.log("Getting book info...");
-    fetchBookById(res);
+    const bookId = req.query.id;
+    console.log("Getting book info for id: " + bookId);
+    if(!bookId) {
+      res.status(200).json({"is_success": false, "message": "Invalid bookId"});
+    } else {
+      fetchBookById(bookId, res);
+    }
 })
 
-async function fetchBookById(resp) {
-  const apiUrl = 'https://www.googleapis.com/books/v1/volumes/dsz5AwAAQBAJ?key=' + apiKey;
+async function fetchBookById(bookId, resp) {
+  const apiUrl = 'https://www.googleapis.com/books/v1/volumes/' + bookId + '?key=' + apiKey;
   console.log("Making request to : " + apiUrl);
    axios.get(apiUrl)
           .then(response => {

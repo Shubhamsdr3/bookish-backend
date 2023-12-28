@@ -4,7 +4,8 @@ const router = express.Router();
 
 const firestoreDB = require('../init');
 const { READER_COLLECTION } = require('../utils/constants');
-const postCollection = firestoreDB.collection("posts")
+const { POST_COLLECTION } = require('../utils/constants');
+const postCollection = firestoreDB.collection(POST_COLLECTION)
 const readerCollection = firestoreDB.collection(READER_COLLECTION)
 
 // create user
@@ -19,7 +20,8 @@ router.post('/createPost', async function(req, resp) {
         const userSnapshot = await readerCollection.doc(userId).get();
         const postDocRef = postCollection.doc();
         console.log("Reader detail: " + userSnapshot.data());
-        const postBody = Object.assign(previousPost, {
+        const postBody = Object.assign(
+            previousPost, {
             "postId": postDocRef.id,
           })
         const userPost = {
@@ -57,5 +59,23 @@ router.post('/createPost', async function(req, resp) {
         })
     }
 })
+
+router.delete('/feed/delete', async function(req, res) {
+    const postId = req.query.postId;
+    console.log("Deleting post: " + postId);
+    res.setHeader("Content-Type", "application/json")
+    res.setHeader("Charset", "utf-8") 
+    if(!postId) {
+        res.status(200).json({"isSuccess": false, "message": "Not a valid postId"});
+    } else {
+        try {
+            await postCollection.doc(postId).delete();
+            res.status(200).json({"isSuccess": true, "data": "Post deleted"});
+        } catch(error) {
+            res.status(200).json({"isSuccess": true, "message": error});
+        }
+    }
+} )
+
 
 module.exports = router

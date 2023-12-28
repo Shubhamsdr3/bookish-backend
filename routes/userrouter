@@ -4,9 +4,10 @@ const router = express.Router();
 const userInfo = require('../data/userinfo');
 
 const firestoreDB = require('../init');
-const { READER_COLLECTION } = require('../utils/constants');
+const { READER_COLLECTION, FEEDBACK_COLLECTION } = require('../utils/constants');
 
 const userCollection = firestoreDB.collection(READER_COLLECTION)
+const feedbackCollection = firestoreDB.collection(FEEDBACK_COLLECTION)
 
 // get user profile.
 router.get('/reader', async function(req, resp) {
@@ -47,7 +48,8 @@ router.put('/reader/profile/update', async function(req, resp) {
             'createdAt': userDetails.createdAt,
             'privacy': userDetails.privacy,
             'phoneNumber': userDetails.phoneNumber,
-            'readingStatus': userDetails.userStatus
+            'readingStatus': userDetails.userStatus,
+            'userId': userDetails.userId
             }, {merge: true});
         const userDocRef = userCollection.doc(userId).get()
         userDocRef.then(snapshot => {
@@ -59,5 +61,27 @@ router.put('/reader/profile/update', async function(req, resp) {
         })
     }
 })
+
+router.post('/reader/feedback', async function(req, res) {
+    try {
+        const feedback = req.body;
+        console.log("User feedback: " + feedback['subject']);
+        res.setHeader("Content-Type", "application/json")
+        res.setHeader("Charset", "utf-8")
+        const documentRef = feedbackCollection.doc();
+        await documentRef.set(feedback);
+        feedbackCollection.doc(documentRef.id).get().then(snapshot => {
+            console.log(snapshot.data());
+            res.status(200).json({"isSuccess": true, "data": snapshot.data()});
+        }).catch(error => {
+            console.log(error);
+            res.status(200).json({"isSuccess": false, "message": error.message});
+        })
+
+    } catch(err) {
+        console.log(err);
+        res.status(200).json({"isSuccess": false, "message": "Error in adding in feedback."});
+    }
+});
 
 module.exports = router

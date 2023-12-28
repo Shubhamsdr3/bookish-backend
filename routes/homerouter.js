@@ -5,7 +5,6 @@ const firestoreDB = require('../init');
 const { POST_COLLECTION } = require('../utils/constants');
 
 const postCollections = firestoreDB.collection(POST_COLLECTION)
-const readerCollection = firestoreDB.collection("readers")
 
 const apiKey = process.env.GOOGLE_MAP_KEY
 
@@ -26,6 +25,21 @@ router.get('/home/feed', async function(req, resp) {
         console.log(error);
         resp.status(200).json({"isSuccess": false, "data": error.meesage})
     }
+})
+
+router.get('/home/feed/detail', async function(req, res) {
+    const postId = req.query.id;
+    res.setHeader("Content-Type", "application/json")
+    res.setHeader("Charset", "utf-8")
+    if(!postId) {
+        res.status(200).json({"isSuccess": false, "data": "Invalid postId."});
+    } else {
+        const snapShot = await postCollections.doc(postId).get();
+        console.log("The post" + JSON.stringify(snapShot.data()));
+        res.status(200).json({"isSuccess": true, "data": snapShot.data()});
+    }
+    console.log("Getting detail for post: " + req.query.id);
+
 })
   
 module.exports = router

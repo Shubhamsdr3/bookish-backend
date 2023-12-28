@@ -19,6 +19,9 @@ app.use('/api/bookish', createPost);
 const bookInfo = require('./routes/bookrouter')
 app.use('/api/bookish', bookInfo);
 
+const exchangeRouter = require('./routes/book_exchange')
+app.use('/api/bookish', exchangeRouter);
+
 //Connecting to DB
 mongoose.connect(process.env.MONGO_URL, {
     useNewUrlParser: true,
