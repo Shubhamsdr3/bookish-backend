@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const homeFeed = require('../data/homefeed');
 const firestoreDB = require('../init');
 const { POST_COLLECTION } = require('../utils/constants');
 

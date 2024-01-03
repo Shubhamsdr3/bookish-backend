@@ -19,8 +19,14 @@ app.use('/api/bookish', createPost);
 const bookInfo = require('./routes/bookrouter')
 app.use('/api/bookish', bookInfo);
 
-const exchangeRouter = require('./routes/book_exchange')
+const exchangeRouter = require('./routes/bookexchange')
 app.use('/api/bookish', exchangeRouter);
+
+const notificationRoute = require('./routes/notificationroute')
+app.use('/api/bookish', notificationRoute);
+
+const bookCategory = require('./routes/categoryrouter')
+app.use('/api/bookish', bookCategory);
 
 //Connecting to DB
 mongoose.connect(process.env.MONGO_URL, {

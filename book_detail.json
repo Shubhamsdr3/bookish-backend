@@ -1,0 +1,92 @@
+{
+    "is_success": true,
+    "data": {
+        "kind": "books#volume",
+        "id": "dsz5AwAAQBAJ",
+        "etag": "23aCW8NH1nY",
+        "selfLink": "https://www.googleapis.com/books/v1/volumes/dsz5AwAAQBAJ",
+        "volumeInfo": {
+            "title": "Hooked",
+            "subtitle": "How to Build Habit-Forming Products",
+            "authors": [
+                "Nir Eyal"
+            ],
+            "publisher": "Penguin",
+            "publishedDate": "2014-11-04",
+            "description": "<b><b>Revised and Updated, Featuring a New Case Study</b><br><br>How do successful companies create products people can’t put down?</b><br><br> Why do some products capture widespread attention while others flop? What makes us engage with certain products out of sheer habit? Is there a pattern underlying how technologies hook us?<p>Nir Eyal answers these questions (and many more) by explaining the Hook Model—a four-step process embedded into the products of many successful companies to subtly encourage customer behavior. Through consecutive “hook cycles,” these products reach their ultimate goal of bringing users back again and again without depending on costly advertising or aggressive messaging.</p><p><i>Hooked</i> is based on Eyal’s years of research, consulting, and practical experience. He wrote the book he wished had been available to him as a start-up founder—not abstract theory, but a how-to guide for building better products. <i>Hooked</i> is written for product managers, designers, marketers, start-up founders, and anyone who seeks to understand how products influence our behavior.</p><p>Eyal provides readers with:</p><p>• Practical insights to create user habits that stick.<br> • Actionable steps for building products people love.</p><p>• Fascinating examples from the iPhone to Twitter, Pinterest to the Bible App, and many other habit-forming products.</p>",
+            "industryIdentifiers": [
+                {
+                    "type": "ISBN_10",
+                    "identifier": "0698190661"
+                },
+                {
+                    "type": "ISBN_13",
+                    "identifier": "9780698190665"
+                }
+            ],
+            "readingModes": {
+                "text": true,
+                "image": false
+            },
+            "pageCount": 256,
+            "printedPageCount": 203,
+            "printType": "BOOK",
+            "categories": [
+                "Business & Economics / Marketing / General",
+                "Business & Economics / Strategic Planning",
+                "Psychology / Applied Psychology"
+            ],
+            "averageRating": 5,
+            "ratingsCount": 1,
+            "maturityRating": "NOT_MATURE",
+            "allowAnonLogging": true,
+            "contentVersion": "1.12.11.0.preview.2",
+            "panelizationSummary": {
+                "containsEpubBubbles": false,
+                "containsImageBubbles": false
+            },
+            "imageLinks": {
+                "smallThumbnail": "http://books.google.com/books/publisher/content?id=dsz5AwAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&imgtk=AFLRE70jrVO00x4zdglMHdVa7A4IAPHbBWR5qwIMfpTz-aZhUhftpNJvNyG_x5qHz7ZFlAI-FpxEP-ofgCjrDQEYq7jTxjYgM3tz8E_SiJ4r6PS4hfFCDEr7ONrweD_jaH1RyTkzLh-Y&source=gbs_api",
+                "thumbnail": "http://books.google.com/books/publisher/content?id=dsz5AwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&imgtk=AFLRE70_dANE18ZP6ZgV6wiHyGgZHY2wZTAfYt8B81oNVVro5Xspta5myuqpFh4cqYf9F3exAw-6Ht770rXhBAWXIWTeZDKNDp1UWIAPRUbXhzruwKTKEO_58adZtp1l4hzifpIh675e&source=gbs_api",
+                "small": "http://books.google.com/books/publisher/content?id=dsz5AwAAQBAJ&printsec=frontcover&img=1&zoom=2&edge=curl&imgtk=AFLRE73RNEwUrQUja_Et3QFhllCei80WjxeaeNKgCkz-ERFmeYuseI5eTGSneTNpKGnmZ1hJ4qOE5EtMynxIYs3OrZMk6OZlK-MQEVRy_C0CBJS7zhdL_hW9X6i171hF_0jepAS__kTv&source=gbs_api",
+                "medium": "http://books.google.com/books/publisher/content?id=dsz5AwAAQBAJ&printsec=frontcover&img=1&zoom=3&edge=curl&imgtk=AFLRE71VpIWZ-s52gXvrBsPJ1VCfLeAaXOj3aZNKC8rcB2-l6rwLTrsOFaOWHxNCWhuDkHsuCyrksr6R6nIl-5maTV8pzXOMmhFrLzTPgFcJa5BnCSGCOUGPnLbOXlZ6pCaufoP5sLOY&source=gbs_api",
+                "large": "http://books.google.com/books/publisher/content?id=dsz5AwAAQBAJ&printsec=frontcover&img=1&zoom=4&edge=curl&imgtk=AFLRE70xoE6-MANpDr3x3Y5O9EVMqvMsJ1F9hydFsUPpnV-nzpi8KZlV0sHejVDOKcsIhhK4Nme1RKx_CNa7lvFskbHkygYxjSlolCzzMh9HLBjRQ1_WWShQ2pO3c1eWPgzJgPyGsEO6&source=gbs_api",
+                "extraLarge": "http://books.google.com/books/publisher/content?id=dsz5AwAAQBAJ&printsec=frontcover&img=1&zoom=6&edge=curl&imgtk=AFLRE71oZ9FcD6ZRZNRvRfDecd5VVUS4Sf0YKa7cspSfGFixZa-HAR94MHFrOQIzojod2gH_sP6oKbygKU_jcbWTQT1DKD1eW63OYNP2wThYC6gJ_o6C164PXb31yXwZtErlaT_wPyDe&source=gbs_api"
+            },
+            "language": "en",
+            "previewLink": "http://books.google.co.in/books?id=dsz5AwAAQBAJ&hl=&source=gbs_api",
+            "infoLink": "https://play.google.com/store/books/details?id=dsz5AwAAQBAJ&source=gbs_api",
+            "canonicalVolumeLink": "https://play.google.com/store/books/details?id=dsz5AwAAQBAJ"
+        },
+        "layerInfo": {
+            "layers": [
+                {
+                    "layerId": "geo",
+                    "volumeAnnotationsVersion": "14"
+                }
+            ]
+        },
+        "saleInfo": {
+            "country": "IN",
+            "saleability": "NOT_FOR_SALE",
+            "isEbook": false
+        },
+        "accessInfo": {
+            "country": "IN",
+            "viewability": "PARTIAL",
+            "embeddable": true,
+            "publicDomain": false,
+            "textToSpeechPermission": "ALLOWED",
+            "epub": {
+                "isAvailable": true,
+                "acsTokenLink": "http://books.google.co.in/books/download/Hooked-sample-epub.acsm?id=dsz5AwAAQBAJ&format=epub&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+            },
+            "pdf": {
+                "isAvailable": false
+            },
+            "webReaderLink": "http://play.google.com/books/reader?id=dsz5AwAAQBAJ&hl=&source=gbs_api",
+            "accessViewStatus": "SAMPLE",
+            "quoteSharingAllowed": false
+        }
+    }
+}

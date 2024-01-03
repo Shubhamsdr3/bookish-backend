@@ -1,10 +1,13 @@
 const e = require('express');
 const express = require('express');
 const router = express.Router();
+const notificationData = require('../data/notification');
+const {sendNotification, sendNotificationTopic } = require('../fcm/fcmcloud')
 
 const firestoreDB = require('../init');
-const { READER_COLLECTION } = require('../utils/constants');
+const { READER_COLLECTION, USER_TOPICS_COLLECTION, TOPICS_COLLECTION, TOPIC_DOC_ID, NON_FICTION_COLLECTION } = require('../utils/constants');
 const { POST_COLLECTION } = require('../utils/constants');
+const topicCollection = firestoreDB.collection(TOPICS_COLLECTION)
 const postCollection = firestoreDB.collection(POST_COLLECTION)
 const readerCollection = firestoreDB.collection(READER_COLLECTION)
 
@@ -19,13 +22,14 @@ router.post('/createPost', async function(req, resp) {
     } else {
         const userSnapshot = await readerCollection.doc(userId).get();
         const postDocRef = postCollection.doc();
-        console.log("Reader detail: " + userSnapshot.data());
+        const userDetail = userSnapshot.data();
+        console.log("Reader detail: " + userDetail);
         const postBody = Object.assign(
             previousPost, {
             "postId": postDocRef.id,
           })
         const userPost = {
-            "reader": userSnapshot.data(), 
+            "reader": userDetail, 
             "post": postBody, 
             'createdAt': new Date().getTime(), 
             "isLiked": req.body.isLiked,
@@ -49,9 +53,10 @@ router.post('/createPost', async function(req, resp) {
             }
         }
         console.log("Creating post for userid " + userId + ":" + JSON.stringify(userPost));
-         postDocRef.set(userPost);
-        postDocRef.get().then(snapShot => {
-            console.log(snapShot.data())   
+        postDocRef.set(userPost);
+        postDocRef.get().then(async snapShot => {
+            console.log("Created post: " + JSON.stringify(snapShot.data()))   
+            await sendCreatePostNotification(userDetail, snapShot.data());
             resp.status(200).json({"isSuccess": true, "data": snapShot.data()})
         }).catch(error => {
             console.log(error)
@@ -60,8 +65,54 @@ router.post('/createPost', async function(req, resp) {
     }
 })
 
-router.delete('/feed/delete', async function(req, res) {
-    const postId = req.query.postId;
+async function sendCreatePostNotification(userDetail, postDetails) {
+    try {
+        const userTopicSnapshot = await firestoreDB.collection(USER_TOPICS_COLLECTION).get();
+        userTopicSnapshot.docs.map(async doc => {
+            const bookCategory = doc.data()
+            console.log("User ids: " + doc.id);
+            const fictionList = [bookCategory['fictionList']];
+            const nonfictionList = [bookCategory['nonFictionList']];
+            const others = [bookCategory['others']]
+            console.log("Fiction: " + fictionList + " Non-fiction list" + nonfictionList);
+            const bookCategories = [postDetails.bookCategories];
+            const topicDocReference = topicCollection.doc(TOPIC_DOC_ID)
+            let shouldSendNotification = false;
+            bookCategories.forEach(topic => {
+                if(fictionList.includes[topic] || nonfictionList.includes(topic) || others.includes(topic)) {
+                    shouldSendNotification = true;
+                } else {
+                    topicDocReference.set("others", FieldValue.arrayUnion(topic));
+                }
+            });
+            console.log("Should send notification ? " + shouldSendNotification +  "for : " + doc.id);
+            if(shouldSendNotification && doc.id != postDetails.reader.userId) {
+                const notificationSnapshot = await firestoreDB.collection("notifications").doc(doc.id).get();
+                let fcmToken = notificationSnapshot.data()['fcmToken']
+                console.log("FCM token: " + fcmToken + " for " + doc.id);
+                const notificationInfo = {
+                    'token': fcmToken,
+                    'title': userDetail.name + " shared a post",
+                    'message': postDetails.post.caption + " : " + postDetails.post.bookName.split(':')[0],
+                    'deeplinkUrl': "",
+                    'isRead': "false",
+                    'createdAt': ''+ postDetails.createdAt
+                }
+                sendNotification(notificationInfo, function success(messageId) {
+                    console.log("Notification sent successfully: " + messageId);
+                }, 
+                function error(message) {
+                    console.log("Notification sent failed: " + message);
+                }) 
+            }
+        })
+    } catch(error) {
+        console.log(error);
+    }
+}
+
+router.delete('/feed/delete/:postId', async function(req, res) {
+    const postId = req.params.postId;
     console.log("Deleting post: " + postId);
     res.setHeader("Content-Type", "application/json")
     res.setHeader("Charset", "utf-8") 
@@ -75,7 +126,7 @@ router.delete('/feed/delete', async function(req, res) {
             res.status(200).json({"isSuccess": true, "message": error});
         }
     }
-} )
+})
 
 
 module.exports = router
