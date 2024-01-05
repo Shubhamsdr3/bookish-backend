@@ -56,7 +56,7 @@ router.post('/createPost', async function(req, resp) {
         postDocRef.set(userPost);
         postDocRef.get().then(async snapShot => {
             console.log("Created post: " + JSON.stringify(snapShot.data()))   
-            await sendCreatePostNotification(userDetail, snapShot.data());
+            await sendCreatePostNotification(userDetail, snapShot.data(), postDocRef.id);
             resp.status(200).json({"isSuccess": true, "data": snapShot.data()})
         }).catch(error => {
             console.log(error)
@@ -65,7 +65,7 @@ router.post('/createPost', async function(req, resp) {
     }
 })
 
-async function sendCreatePostNotification(userDetail, postDetails) {
+async function sendCreatePostNotification(userDetail, postDetails, postId) {
     try {
         const userTopicSnapshot = await firestoreDB.collection(USER_TOPICS_COLLECTION).get();
         userTopicSnapshot.docs.map(async doc => {
@@ -94,7 +94,7 @@ async function sendCreatePostNotification(userDetail, postDetails) {
                     'token': fcmToken,
                     'title': userDetail.name + " shared a post",
                     'message': postDetails.post.caption + " : " + postDetails.post.bookName.split(':')[0],
-                    'deeplinkUrl': "",
+                    'deeplinkUrl': "https://bookissh-web.web.app/post/" + postId,
                     'isRead': "false",
                     'createdAt': ''+ postDetails.createdAt
                 }
