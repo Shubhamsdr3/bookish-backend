@@ -76,45 +76,47 @@ async function sendCreatePostNotification(userDetail, postDetails, postId) {
             const nonfictionList = [bookCategory['nonFictionList']];
             const others = [bookCategory['others']]
             console.log("Fiction list: " + fictionList + "\n" + "Non-fiction list: " + nonfictionList + " for user: " + doc.id);
-            const bookCategories = postDetails.post['bookCategories'];
-            console.log("The book categories: " + bookCategories);
-            const topicDocReference = topicCollection.doc(TOPIC_DOC_ID)
-            let shouldSendNotification = true;
-            //TODO fixme : SHUBHAM send notification only user who has subscribed it.
-            bookCategories.forEach(topic => {
-                topicDocReference.update("others", FieldValue.arrayUnion(topic));
-                // console.log("Topic: " + topic);
-                // if(fictionList.includes(topic) || nonfictionList.includes(topic) || others.includes(topic)) {
-                //     // shouldSendNotification = true;
-                // } else {
-                //     topicDocReference.update("others", FieldValue.arrayUnion(topic));
-                // }
-            });
-            console.log("Should send notification ? " + shouldSendNotification +  " for : " + doc.id);
-            if(shouldSendNotification && doc.id != postDetails.reader.userId) {
-                firestoreDB.collection(NOTIFICATION_COLLECTION)
-                .doc(doc.id).get()
-                .then((snapShot) => {
-                    if(snapShot.exists) {
-                        console.log("The notification data: " + JSON.stringify(snapShot.data()));
-                        const fcmToken = snapShot.data()['fcmToken']
-                        console.log("FCM token: " + fcmToken + " for " + doc.id);
-                        const notificationInfo = {
-                            'token': fcmToken,
-                            'title': userDetail.name + " shared a post",
-                            'message': postDetails.post.caption + " : " + postDetails.post.bookName.split(':')[0],
-                            'deeplinkUrl': "https://bookissh-web.web.app/post/" + postId,
-                            'isRead': "false",
-                            'createdAt': ''+ postDetails.createdAt
-                        }
-                        sendNotification(notificationInfo, function success(messageId) {
-                            console.log("Notification sent successfully: " + messageId);
-                        }, 
-                        function error(message) {
-                            console.log("Notification sent failed: " + message);
-                        }) 
-                    }
+            if(postDetails.hasOwnProperty('post') && postDetails.hasOwnProperty('post').hasOwnProperty('bookCategories')) {
+                const bookCategories = postDetails.post['bookCategories'];
+                console.log("The book categories: " + bookCategories);
+                const topicDocReference = topicCollection.doc(TOPIC_DOC_ID)
+                let shouldSendNotification = true;
+                //TODO fixme : SHUBHAM send notification only user who has subscribed it.
+                bookCategories.forEach(topic => {
+                    topicDocReference.update("others", FieldValue.arrayUnion(topic));
+                    // console.log("Topic: " + topic);
+                    // if(fictionList.includes(topic) || nonfictionList.includes(topic) || others.includes(topic)) {
+                    //     // shouldSendNotification = true;
+                    // } else {
+                    //     topicDocReference.update("others", FieldValue.arrayUnion(topic));
+                    // }
                 });
+                console.log("Should send notification ? " + shouldSendNotification +  " for : " + doc.id);
+                if(shouldSendNotification && doc.id != postDetails.reader.userId) {
+                    firestoreDB.collection(NOTIFICATION_COLLECTION)
+                    .doc(doc.id).get()
+                    .then((snapShot) => {
+                        if(snapShot.exists) {
+                            console.log("The notification data: " + JSON.stringify(snapShot.data()));
+                            const fcmToken = snapShot.data()['fcmToken']
+                            console.log("FCM token: " + fcmToken + " for " + doc.id);
+                            const notificationInfo = {
+                                'token': fcmToken,
+                                'title': userDetail.name + " shared a post",
+                                'message': postDetails.post.caption + " : " + postDetails.post.bookName.split(':')[0],
+                                'deeplinkUrl': "https://bookissh-web.web.app/post/" + postId,
+                                'isRead': "false",
+                                'createdAt': ''+ postDetails.createdAt
+                            }
+                            sendNotification(notificationInfo, function success(messageId) {
+                                console.log("Notification sent successfully: " + messageId);
+                            }, 
+                            function error(message) {
+                                console.log("Notification sent failed: " + message);
+                            }) 
+                        }
+                    });
+                }
             }
         })
     } catch(error) {
