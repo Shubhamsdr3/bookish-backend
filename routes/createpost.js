@@ -92,30 +92,37 @@ async function sendCreatePostNotification(userDetail, postDetails, postId) {
             });
             console.log("Should send notification ? " + shouldSendNotification +  " for : " + doc.id);
             if(shouldSendNotification && doc.id != postDetails.reader.userId) {
-                const notificationSnapshot = await firestoreDB.collection(NOTIFICATION_COLLECTION).doc(doc.id).get();
-                console.log("The notification data: " + JSON.stringify(notificationSnapshot.data()));
-                const fcmToken = notificationSnapshot.data()['fcmToken']
-                console.log("FCM token: " + fcmToken + " for " + doc.id);
-                const notificationInfo = {
-                    'token': fcmToken,
-                    'title': userDetail.name + " shared a post",
-                    'message': postDetails.post.caption + " : " + postDetails.post.bookName.split(':')[0],
-                    'deeplinkUrl': "https://bookissh-web.web.app/post/" + postId,
-                    'isRead': "false",
-                    'createdAt': ''+ postDetails.createdAt
-                }
-                sendNotification(notificationInfo, function success(messageId) {
-                    console.log("Notification sent successfully: " + messageId);
-                }, 
-                function error(message) {
-                    console.log("Notification sent failed: " + message);
-                }) 
+                firestoreDB.collection(NOTIFICATION_COLLECTION)
+                .doc(doc.id).get()
+                .then((snapShot) => {
+                    if(snapShot.exists) {
+                        console.log("The notification data: " + JSON.stringify(snapShot.data()));
+                        const fcmToken = snapShot.data()['fcmToken']
+                        console.log("FCM token: " + fcmToken + " for " + doc.id);
+                        const notificationInfo = {
+                            'token': fcmToken,
+                            'title': userDetail.name + " shared a post",
+                            'message': postDetails.post.caption + " : " + postDetails.post.bookName.split(':')[0],
+                            'deeplinkUrl': "https://bookissh-web.web.app/post/" + postId,
+                            'isRead': "false",
+                            'createdAt': ''+ postDetails.createdAt
+                        }
+                        sendNotification(notificationInfo, function success(messageId) {
+                            console.log("Notification sent successfully: " + messageId);
+                        }, 
+                        function error(message) {
+                            console.log("Notification sent failed: " + message);
+                        }) 
+                    }
+                });
             }
         })
     } catch(error) {
         console.log(error);
     }
 }
+
+
 
 router.delete('/feed/delete/:postId', async function(req, res) {
     const postId = req.params.postId;
