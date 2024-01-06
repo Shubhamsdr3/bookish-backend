@@ -4,7 +4,6 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        
         {
             "type": "node",
             "request": "launch",
@@ -13,6 +12,17 @@
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}/index.js"
+        },
+        {
+            "name": "Attach to Process",
+            "type": "node",
+            "protocol": "inspector",
+            "request": "attach",
+            "stopOnEntry": false,
+            "port": 5858,
+            "localRoot": "${workspaceRoot}",
+            "remoteRoot": "${workspaceFolder}/index.js",
+            "sourceMaps": true
         }
     ]
 }

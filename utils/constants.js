@@ -11,5 +11,6 @@ module.exports = {
     FICTION_COLLECTION: "fiction",
     NON_FICTION_COLLECTION : "non-fiction",
     USER_TOPICS_COLLECTION : "user_topics",
-    TOPIC_DOC_ID : "QYBKyLsw2DTd6AwZk70q"
+    TOPIC_DOC_ID : "QYBKyLsw2DTd6AwZk70q",
+    NOTIFICATION_COLLECTION:  "notifications"
 };

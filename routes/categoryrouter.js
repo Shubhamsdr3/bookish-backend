@@ -28,7 +28,7 @@ router.post('/book/topics/subscribe/:userId',  async function(request, response)
         const userId = request.params.userId;
         const finctionList = request.body.fictionList;
         const nonFictionList = request.body.nonFictionList;
-        await userTopicCollection.doc(userId).set({"fictionList": finctionList, "nonFictionList": nonFictionList})
+        await userTopicCollection.doc(userId).set({"fictionList": finctionList, "nonFictionList": nonFictionList, "others": []})
         response.status(200).json({"isSuccess": true, "data": "Response success"})
     } catch(error) {
         console.log(error)

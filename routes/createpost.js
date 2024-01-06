@@ -2,10 +2,11 @@ const e = require('express');
 const express = require('express');
 const router = express.Router();
 const notificationData = require('../data/notification');
+const FieldValue = require('firebase-admin').firestore.FieldValue;
 const {sendNotification, sendNotificationTopic } = require('../fcm/fcmcloud')
 
 const firestoreDB = require('../init');
-const { READER_COLLECTION, USER_TOPICS_COLLECTION, TOPICS_COLLECTION, TOPIC_DOC_ID, NON_FICTION_COLLECTION } = require('../utils/constants');
+const { READER_COLLECTION, USER_TOPICS_COLLECTION, TOPICS_COLLECTION, TOPIC_DOC_ID, NON_FICTION_COLLECTION, NOTIFICATION_COLLECTION } = require('../utils/constants');
 const { POST_COLLECTION } = require('../utils/constants');
 const topicCollection = firestoreDB.collection(TOPICS_COLLECTION)
 const postCollection = firestoreDB.collection(POST_COLLECTION)
@@ -74,21 +75,26 @@ async function sendCreatePostNotification(userDetail, postDetails, postId) {
             const fictionList = [bookCategory['fictionList']];
             const nonfictionList = [bookCategory['nonFictionList']];
             const others = [bookCategory['others']]
-            console.log("Fiction: " + fictionList + " Non-fiction list" + nonfictionList);
-            const bookCategories = [postDetails.bookCategories];
+            console.log("Fiction list: " + fictionList + "\n" + "Non-fiction list: " + nonfictionList + " for user: " + doc.id);
+            const bookCategories = postDetails.post['bookCategories'];
+            console.log("The book categories: " + bookCategories);
             const topicDocReference = topicCollection.doc(TOPIC_DOC_ID)
-            let shouldSendNotification = false;
+            let shouldSendNotification = true;
+            //TODO fixme : SHUBHAM send notification only user who has subscribed it.
             bookCategories.forEach(topic => {
-                if(fictionList.includes[topic] || nonfictionList.includes(topic) || others.includes(topic)) {
-                    shouldSendNotification = true;
-                } else {
-                    topicDocReference.set("others", FieldValue.arrayUnion(topic));
-                }
+                topicDocReference.update("others", FieldValue.arrayUnion(topic));
+                // console.log("Topic: " + topic);
+                // if(fictionList.includes(topic) || nonfictionList.includes(topic) || others.includes(topic)) {
+                //     // shouldSendNotification = true;
+                // } else {
+                //     topicDocReference.update("others", FieldValue.arrayUnion(topic));
+                // }
             });
-            console.log("Should send notification ? " + shouldSendNotification +  "for : " + doc.id);
+            console.log("Should send notification ? " + shouldSendNotification +  " for : " + doc.id);
             if(shouldSendNotification && doc.id != postDetails.reader.userId) {
-                const notificationSnapshot = await firestoreDB.collection("notifications").doc(doc.id).get();
-                let fcmToken = notificationSnapshot.data()['fcmToken']
+                const notificationSnapshot = await firestoreDB.collection(NOTIFICATION_COLLECTION).doc(doc.id).get();
+                console.log("The notification data: " + JSON.stringify(notificationSnapshot.data()));
+                const fcmToken = notificationSnapshot.data()['fcmToken']
                 console.log("FCM token: " + fcmToken + " for " + doc.id);
                 const notificationInfo = {
                     'token': fcmToken,
