@@ -72,7 +72,7 @@ exchangeRouter.get('/exchange/friends/:userId', async function(req, res) {
                     console.log("Friend detail " + jsonResponse)
                     friendUsers.push({
                         'friend': freindUserSnapshot.data(),
-                        'currentUser': currentUserSnapShot.data(),
+                        // 'currentUser': currentUserSnapShot.data(),
                         'channelId': freind.channelId,
                         'updatedAt': freind.updatedAt
                     });

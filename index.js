@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const app = express();
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(express.json());
+const socketio = require('socket.io');
 
 // user profile
 const userInfo = require('./routes/userrouter')
@@ -44,3 +45,14 @@ mongoose.connect(process.env.MONGO_URL, {
 );
 
 app.listen(process.env.PORT, () => console.log('Listening on Port 3000'));
+
+const server = app.listen(1337, () => {
+    console.log('Server running!')
+});
+
+const io = socketio(server)
+
+io.on('scoketConnection', (socket) => {
+    console.log(`New connection: ${socket.id}`);
+    socket.emit('notification', 'Thanks for connecting to Codedamn!')
+})

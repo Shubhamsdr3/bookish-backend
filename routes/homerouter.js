@@ -16,9 +16,14 @@ router.get('/home/feed', async function(req, resp) {
         let postList = [];
         const snapshot = await postCollections.orderBy('createdAt', 'desc').get();
         snapshot.docs.map(doc => {
-            console.log("User data: " + JSON.stringify(doc.data()));
+            // console.log("User data: " + JSON.stringify(doc.data()));
+            postList.push(doc.data());
+            postList.push(doc.data());
+            postList.push(doc.data());
+            postList.push(doc.data());
             postList.push(doc.data());
         });
+        console.log("Feed response data: " + JSON.stringify(postList));
         resp.status(200).json({"isSuccess": true, "data": postList})
     } catch(error) {
         console.log(error);
@@ -28,6 +33,7 @@ router.get('/home/feed', async function(req, resp) {
 
 router.get('/home/feed/detail', async function(req, res) {
     const postId = req.query.id;
+    console.log("Getting detail for post: " + postId);
     res.setHeader("Content-Type", "application/json")
     res.setHeader("Charset", "utf-8")
     if(!postId) {
@@ -37,8 +43,6 @@ router.get('/home/feed/detail', async function(req, res) {
         console.log("The post" + JSON.stringify(snapShot.data()));
         res.status(200).json({"isSuccess": true, "data": snapShot.data()});
     }
-    console.log("Getting detail for post: " + req.query.id);
-
 })
   
 module.exports = router

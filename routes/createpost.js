@@ -12,7 +12,7 @@ const topicCollection = firestoreDB.collection(TOPICS_COLLECTION)
 const postCollection = firestoreDB.collection(POST_COLLECTION)
 const readerCollection = firestoreDB.collection(READER_COLLECTION)
 
-// create user
+// create post
 router.post('/createPost', async function(req, resp) {
     const userId = req.body.userId;
     const previousPost = req.body.post;
@@ -123,8 +123,6 @@ async function sendCreatePostNotification(userDetail, postDetails, postId) {
         console.log(error);
     }
 }
-
-
 
 router.delete('/feed/delete/:postId', async function(req, res) {
     const postId = req.params.postId;

@@ -22,12 +22,13 @@
         "install": "^0.13.0",
         "jsonwebtoken": "^9.0.0",
         "mongodb": "^5.0.0",
-        "mongoose": "^5.13.17"
+        "mongoose": "^5.13.17",
+        "socket.io": "^4.8.0"
     },
     "devDependencies": {
         "nodemon": "^3.0.2"
     },
     "engines": {
-        "node": "16"
+        "node": "18"
     }
 }

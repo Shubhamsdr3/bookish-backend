@@ -17,7 +17,7 @@ router.get('/reader', async function(req, resp) {
     resp.setHeader("Charset", "utf-8")
     if(!userId) {
         console.log("User id not valid: " + userId);
-        resp.status(200).json({"isSuccess": false, "message": "Invalid userId."});
+        resp.status(200).json({"isSuccess": false, "data": userInfo});
     } else {
         const userDocRef = userCollection.doc(userId).get()
         userDocRef.then(snapshot => {
@@ -77,7 +77,6 @@ router.post('/reader/feedback', async function(req, res) {
             console.log(error);
             res.status(200).json({"isSuccess": false, "message": error.message});
         })
-
     } catch(err) {
         console.log(err);
         res.status(200).json({"isSuccess": false, "message": "Error in adding in feedback."});
