@@ -1,9 +1,11 @@
 env: flex
 runtime: nodejs
+runtime_config:
+    operating_system: "ubuntu22"
 automatic_scaling:
   min_num_instances: 1
   max_num_instances: 1
 resources:
-  cpu: 1
-  memory_gb: 0.5
+  cpu: 0.5
+  memory_gb: 0.25
   disk_size_gb: 10
