@@ -16,11 +16,6 @@ router.get('/home/feed', async function(req, resp) {
         let postList = [];
         const snapshot = await postCollections.orderBy('createdAt', 'desc').get();
         snapshot.docs.map(doc => {
-            // console.log("User data: " + JSON.stringify(doc.data()));
-            postList.push(doc.data());
-            postList.push(doc.data());
-            postList.push(doc.data());
-            postList.push(doc.data());
             postList.push(doc.data());
         });
         console.log("Feed response data: " + JSON.stringify(postList));
