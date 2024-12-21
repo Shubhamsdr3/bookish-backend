@@ -1,12 +1,12 @@
 const e = require('express');
 const express = require('express');
 const router = express.Router();
-const notificationData = require('../data/notification');
 const FieldValue = require('firebase-admin').firestore.FieldValue;
-const {sendNotification, sendNotificationTopic } = require('../fcm/fcmcloud')
+const {sendNotification } = require('../fcm/fcmcloud')
 
 const firestoreDB = require('../init');
-const { READER_COLLECTION, USER_TOPICS_COLLECTION, TOPICS_COLLECTION, TOPIC_DOC_ID, NON_FICTION_COLLECTION, NOTIFICATION_COLLECTION } = require('../utils/constants');
+const { READER_COLLECTION, USER_TOPICS_COLLECTION, 
+    TOPICS_COLLECTION, TOPIC_DOC_ID, NOTIFICATION_COLLECTION } = require('../utils/constants');
 const { POST_COLLECTION } = require('../utils/constants');
 const topicCollection = firestoreDB.collection(TOPICS_COLLECTION)
 const postCollection = firestoreDB.collection(POST_COLLECTION)
@@ -76,7 +76,7 @@ async function sendCreatePostNotification(userDetail, postDetails, postId) {
             const nonfictionList = [bookCategory['nonFictionList']];
             const others = [bookCategory['others']]
             console.log("Fiction list: " + fictionList + "\n" + "Non-fiction list: " + nonfictionList + " for user: " + doc.id);
-            if(postDetails.hasOwnProperty('post') && postDetails.hasOwnProperty('post').hasOwnProperty('bookCategories')) {
+            if(postDetails && postDetails.hasOwnProperty('post') && postDetails.hasOwnProperty('post').hasOwnProperty('bookCategories')) {
                 const bookCategories = postDetails.post['bookCategories'];
                 console.log("The book categories: " + bookCategories);
                 const topicDocReference = topicCollection.doc(TOPIC_DOC_ID)
