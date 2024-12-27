@@ -16,9 +16,7 @@
         {
             "name": "Attach to Process",
             "type": "node",
-            "protocol": "inspector",
             "request": "attach",
-            "stopOnEntry": false,
             "port": 5858,
             "localRoot": "${workspaceRoot}",
             "remoteRoot": "${workspaceFolder}/index.js",

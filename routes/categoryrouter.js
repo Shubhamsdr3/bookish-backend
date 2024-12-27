@@ -1,3 +1,4 @@
+const e = require('express');
 const express = require('express');
 const router = express.Router();
 const firestoreDB = require('../init');
@@ -13,11 +14,17 @@ router.get('/book/topics', async function(req, res) {
         const responseJson = {}
         res.setHeader("Content-Type", "application/json")
         res.setHeader("Charset", "utf-8")
-        const fictionSnapshot = await topicCollection.doc(TOPIC_DOC_ID).get()
-        responseJson["fictions"] = fictionSnapshot.data()['fictions']
-        responseJson["nonFictions"] = fictionSnapshot.data()['nonFictions']
-        res.status(200).json({"isSuccess": true, "data": responseJson})
+        const snapShot = await topicCollection.doc(TOPIC_DOC_ID).get()
+        if(fictionSnapshot.exists) {
+            const data = fictionSnapshot.data();
+            responseJson["fictions"] = data['fictions']
+            responseJson["nonFictions"] = data['nonFictions']
+            res.status(200).json({"isSuccess": true, "data": responseJson})
+        } else {
+            res.status(200).json({"isSuccess": false, "data": "No data found"})
+        }
     } catch(error) {
+        console.log(error);
         res.status(200).json({"isSuccess": false, "data": error.meesage})
     }
 })
