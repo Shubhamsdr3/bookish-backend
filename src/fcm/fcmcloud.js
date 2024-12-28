@@ -1,6 +1,6 @@
-const admin = require('firebase-admin');
+import admin from 'firebase-admin';
 
-const sendNotification = (notificationData, successCallback, erorrCallback) => {
+export const sendNotification = (notificationData, successCallback, erorrCallback) => {
   console.log("FCM token: " + notificationData.token)
   const message = {
     data: notificationData,
@@ -30,21 +30,20 @@ const sendNotification = (notificationData, successCallback, erorrCallback) => {
   }
 
 
-const subscribeToTopic = (registrationTokens, topic, successCallback, erorrCallback) => {
+export const subscribeToTopic = (registrationTokens, topic, successCallback, erorrCallback) => {
   admin.messaging().subscribeToTopic(registrationTokens, topic)
   .then((response) => {
     // See the MessagingTopicManagementResponse reference documentation
     // for the contents of response.
     console.log('Successfully subscribed to topic:', response);
     successCallback(response);
-  })
-  .catch((error) => {
+  }).catch((error) => {
     console.log('Error subscribing to topic:', error);
     erorrCallback(error);
   });
 }
 
-const sendNotificationTopic = (topic, notificationData, successCallback, erorrCallback) => {
+export const sendNotificationTopic = (topic, notificationData, successCallback, erorrCallback) => {
   const notificationMessage = {
     notification: {
       title: notificationData.title,
@@ -61,10 +60,4 @@ const sendNotificationTopic = (topic, notificationData, successCallback, erorrCa
     console.log('Error sending message:', error);
     erorrCallback(error);
 });
-}
-
-module.exports = {
-  sendNotification,
-  subscribeToTopic,
-  sendNotificationTopic
 }

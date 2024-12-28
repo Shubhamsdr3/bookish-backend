@@ -4,7 +4,8 @@ import { authMiddleware } from '../middleware/auth.js';
 
 const router = Router();
 
-router.get('/notifications', authMiddleware, notificationController.getNotifications);
-// Add other notification routes here
+router.post('/sendNotification', notificationController.sendNotification);
+router.post('/sendNotification/:topic', notificationController.sendNotificationTopic);
+router.post('/subscribeTopic/:topic', notificationController.subscribeTopic);
 
 export default router;

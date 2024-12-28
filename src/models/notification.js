@@ -1,10 +1,9 @@
-const notificationData = {
-    "token": "",
-    "userId": "",
-    "title": "This is title",
-    "message": "This is decription",
-    "deeplinkUrl": "",
-    "isRead": "false",
-    "createdAt": "1703993011000"
-}
-module.exports = notificationData
+export const notification = {
+    token: '',
+    title: '',
+    message: '',
+    deeplinkUrl: '',
+    isRead: false,
+    createdAt: '',
+    data: {}
+};
