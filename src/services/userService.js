@@ -1,10 +1,35 @@
 import { firestoreDB } from '../utils/init.js';
+import jwt from 'jsonwebtoken';
 import { READER_COLLECTION, FEEDBACK_COLLECTION } from '../utils/constants.js';
 
 const userCollection = firestoreDB.collection(READER_COLLECTION);
 const feedbackCollection = firestoreDB.collection(FEEDBACK_COLLECTION);
 
 export const userService = {
+
+    async createUser(userData) {
+        try {
+            const userDoc = userCollection.doc();
+            const jwtToken = jwt.sign(
+                { userId: user._id }, 
+                process.env.JWT_SECRET,
+                { expiresIn: '1h' }
+            );
+            userData.authToken = jwtToken;
+            await userDoc.set(userData);
+            return {
+                isSuccess: true,
+                data: userDoc.data()
+            };
+        } catch (error) {
+            console.error("Error creating user:", error);
+            return {
+                isSuccess: false,
+                message: error.message
+            };
+        }
+    },
+
     async getUserById(userId) {
         try {
             console.log("Getting info for user: " + userId);
@@ -34,6 +59,12 @@ export const userService = {
     async loginUser(userData) {
         try {
             const userDoc = userCollection.doc();
+            const token = jwt.sign(
+                { userId: userDoc.id },
+                process.env.JWT_SECRET,
+                { expiresIn: '24h' }
+            );
+
             const newUser = {
                 userId: userDoc.id,
                 userName: userData.userName,
@@ -43,17 +74,20 @@ export const userService = {
                 createdAt: Date.now(),
                 privacy: userData.privacy || 'public',
                 phoneNumber: userData.phoneNumber,
-                readingStatus: userData.userStatus || 'active'
+                readingStatus: userData.userStatus || 'active',
             };
-
+        
             await userDoc.set(newUser);
-            
+            console.log("User Info: " + JSON.stringify(newUser));
             return {
                 isSuccess: true,
-                data: newUser
+                data: {
+                    "token": token,
+                    "user": newUser
+                }
             };
         } catch (error) {
-            console.error("Error creating user:", error);
+            console.error("Error in login:", error);
             return {
                 isSuccess: false,
                 message: error.message

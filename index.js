@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import cors from 'cors';
 import express from 'express';
 import mongoose from 'mongoose';
 import { Server } from 'socket.io';
@@ -16,6 +17,17 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// CORS Configuration
+const corsOptions = {
+    origin: '*', // or your specific domains
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'Accept', 'X-Requested-With'],
+    exposedHeaders: ['Authorization'],
+    credentials: true
+};
+
+app.use(cors(corsOptions));
+
 // Routes
 app.use('/api/bookish', [
     userRoutes,
@@ -26,6 +38,19 @@ app.use('/api/bookish', [
     notificationRoutes,
     categoryRoutes
 ]);
+// Test endpoint for headers
+app.get('/api/test-auth', (req, res) => {
+    console.log('Headers received:', {
+        authorization: req.headers.authorization,
+        'content-type': req.headers['content-type'],
+        origin: req.headers.origin
+    });
+    
+    res.json({
+        message: 'Headers received',
+        headers: req.headers
+    });
+});
 
 // Database connection
 mongoose.connect(process.env.MONGO_URL, {
@@ -54,6 +79,15 @@ const io = new Server(wsServer);
 io.on('connection', (socket) => {
     console.log(`New connection: ${socket.id}`);
     socket.emit('notification', 'Thanks for connecting to Bookish!');
+});
+
+// Add error handling middleware
+app.use((err, req, res, next) => {
+    console.error('Error:', err);
+    res.status(err.status || 500).json({
+        message: err.message || 'Internal Server Error',
+        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
 });
 
 export default app;

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { homeController } from '../controllers/homeController.js';
-import { authMiddleware } from '../middleware/auth.js';
+import { verifyToken } from '../middleware/auth.js';
 
 const router = Router();
 
@@ -14,7 +14,7 @@ const router = Router();
  *       200:
  *         description: Home feed
  */
-router.get('/home/feed', homeController.getHomeFeed);
+router.get('/home/feed', verifyToken, homeController.getHomeFeed);
 
 /**
  * @swagger
@@ -26,7 +26,7 @@ router.get('/home/feed', homeController.getHomeFeed);
  *       200:
  *         description: Post details
  */
-router.get('/home/feed/details', homeController.getPostDetails);
+router.get('/home/feed/details', verifyToken, homeController.getPostDetails);
 // Add other home routes here
 
 export default router;
