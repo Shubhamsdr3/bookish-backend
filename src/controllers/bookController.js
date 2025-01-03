@@ -5,7 +5,7 @@ export const bookController = {
 
     async searchBooks(req, res) {
         try {
-            const books = await bookService.searchBooks(req.query.search);
+            const books = await bookService.searchBooks(req.query.searchTerm);
             res.status(200).json(books);
         } catch (error) {
             res.status(500).json({ error: error.message });

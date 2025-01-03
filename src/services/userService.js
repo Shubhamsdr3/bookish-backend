@@ -1,5 +1,6 @@
 import { firestoreDB } from '../utils/init.js';
 import jwt from 'jsonwebtoken';
+import Token from '../models/token.js';
 import { READER_COLLECTION, FEEDBACK_COLLECTION } from '../utils/constants.js';
 
 const userCollection = firestoreDB.collection(READER_COLLECTION);
@@ -42,7 +43,7 @@ export const userService = {
             if (!userDoc.exists) {
                 throw new Error("User not found");
             }
-
+            console.log("User Info: " + JSON.stringify(userDoc.data()));
             return {
                 isSuccess: true,
                 data: userDoc.data()
@@ -70,9 +71,9 @@ export const userService = {
                 userName: userData.userName,
                 name: userData.name,
                 profileIcon: userData.profileIcon || '',
-                connections: userData.connections || [],
+                connections: userData.connections || 0,
                 createdAt: Date.now(),
-                privacy: userData.privacy || 'public',
+                privacy: userData.privacy || 0,
                 phoneNumber: userData.phoneNumber,
                 readingStatus: userData.userStatus || 'active',
             };
@@ -130,6 +131,27 @@ export const userService = {
             };
         } catch (error) {
             console.error("Error adding feedback:", error);
+            return {
+                isSuccess: false,
+                message: error.message
+            };
+        }
+    },
+
+    async logoutUser(token) {
+        try {
+            // Invalidate current token
+            await Token.findOneAndUpdate(
+                { token: req.token },
+                { isValid: false }
+            );
+    
+            return { 
+                isSuccess: true,
+                message: 'Logged out successfully' 
+            };
+        } catch (error) {
+            console.error("Error during logout:", error);
             return {
                 isSuccess: false,
                 message: error.message

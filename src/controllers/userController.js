@@ -21,7 +21,7 @@ export const userController = {
 
     async getProfile(req, res) {
         try {
-            const user = await userService.getUserById(req.query.id);
+            const user = await userService.getUserById(req.query.userId);
             res.status(200).json(user);
         } catch (error) {
             res.status(404).json({ error: error.message });
@@ -41,6 +41,19 @@ export const userController = {
         try {
             const feedback = await userService.addFeedback(req.body);
             res.status(200).json(feedback);
+        } catch (error) {
+            res.status(400).json({ error: error.message });
+        }
+    },
+
+    async logout(req, res) {
+        try {
+            const result = await userService.logoutUser(req.token);
+            if (result.isSuccess) {
+                res.status(200).json({ message: 'Logout successful' });
+            } else {
+                res.status(400).json({ error: result.message });
+            }
         } catch (error) {
             res.status(400).json({ error: error.message });
         }
