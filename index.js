@@ -1,58 +1,93 @@
-require("dotenv").config()
-const express = require('express');
-const bodyParser = require("body-parser");
-const mongoose = require('mongoose');
+import 'dotenv/config';
+import cors from 'cors';
+import express from 'express';
+import mongoose from 'mongoose';
+import { Server } from 'socket.io';
+import bookRoutes from './src/routes/bookrouter.js';
+import userRoutes from './src/routes/userrouter.js';
+import homeFeedRoutes from './src/routes/homerouter.js';
+import postRoutes from './src/routes/createpost.js';
+import exchangeRoutes from './src/routes/bookexchange.js';
+import notificationRoutes from './src/routes/notificationroute.js';
+import categoryRoutes from './src/routes/categoryrouter.js';
+
 const app = express();
-app.use(bodyParser.urlencoded({extended: true}))
+
+// Middleware
 app.use(express.json());
-const socketio = require('socket.io');
+app.use(express.urlencoded({ extended: true }));
 
-// user profile
-const userInfo = require('./routes/userrouter')
-app.use('/api/bookish', userInfo)
+// CORS Configuration
+const corsOptions = {
+    origin: '*', // or your specific domains
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'Accept', 'X-Requested-With'],
+    exposedHeaders: ['Authorization'],
+    credentials: true
+};
 
-const homeFeed = require('./routes/homerouter')
-app.use('/api/bookish', homeFeed);
+app.use(cors(corsOptions));
 
-const createPost = require('./routes/createpost')
-app.use('/api/bookish', createPost);
-
-const bookInfo = require('./routes/bookrouter')
-app.use('/api/bookish', bookInfo);
-
-const exchangeRouter = require('./routes/bookexchange')
-app.use('/api/bookish', exchangeRouter);
-
-const notificationRoute = require('./routes/notificationroute')
-app.use('/api/bookish', notificationRoute);
-
-const bookCategory = require('./routes/categoryrouter')
-app.use('/api/bookish', bookCategory);
-
-//Connecting to DB
-mongoose.connect(process.env.MONGO_URL, {
-    useNewUrlParser: true,
-    serverSelectionTimeoutMS: 1000,
-    useUnifiedTopology: true,
-    useCreateIndex: true
-  }, function (err, res) {
-        try {
-            console.log('Connected to Database');
-        } catch (err) {
-            console.log(err);
-        }
-    } 
-);
-
-app.listen(process.env.PORT, () => console.log('Listening on Port 3000'));
-
-const server = app.listen(1337, () => {
-    console.log('Server running!')
+// Routes
+app.use('/api/bookish', [
+    userRoutes,
+    homeFeedRoutes,
+    postRoutes,
+    bookRoutes,
+    exchangeRoutes,
+    notificationRoutes,
+    categoryRoutes
+]);
+// Test endpoint for headers
+app.get('/api/test-auth', (req, res) => {
+    console.log('Headers received:', {
+        authorization: req.headers.authorization,
+        'content-type': req.headers['content-type'],
+        origin: req.headers.origin
+    });
+    
+    res.json({
+        message: 'Headers received',
+        headers: req.headers
+    });
 });
 
-const io = socketio(server)
+// Database connection
+mongoose.connect(process.env.MONGO_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}).then(() => {
+    console.log('Connected to Database');
+}).catch((err) => {
+    console.error('Database connection error:', err);
+});
 
-io.on('scoketConnection', (socket) => {
+// HTTP Server
+const PORT = process.env.PORT || 3000;
+const httpServer = app.listen(PORT, () => {
+    console.log(`HTTP Server running on port ${PORT}`);
+});
+
+// WebSocket Server
+const SOCKET_PORT = 1337;
+const wsServer = app.listen(SOCKET_PORT, () => {
+    console.log(`WebSocket Server running on port ${SOCKET_PORT}`);
+});
+
+const io = new Server(wsServer);
+
+io.on('connection', (socket) => {
     console.log(`New connection: ${socket.id}`);
-    socket.emit('notification', 'Thanks for connecting to Codedamn!')
-})
+    socket.emit('notification', 'Thanks for connecting to Bookish!');
+});
+
+// Add error handling middleware
+app.use((err, req, res, next) => {
+    console.error('Error:', err);
+    res.status(err.status || 500).json({
+        message: err.message || 'Internal Server Error',
+        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
+});
+
+export default app;

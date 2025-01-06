@@ -1,0 +1,13 @@
+export const READER_COLLECTION = "readers";
+export const POST_COLLECTION = "posts";
+export const FEEDBACK_COLLECTION = "feedback";
+export const CHAT_CHANNEL_COLLECTION = "chat_channel";
+export const CHAT_USERS_COLLECTION = "chat_users";
+export const CHATS_COLLECTION = "chats";
+export const FRIENDS_COLLECTION = "friends";
+export const TOPICS_COLLECTION = "topics";
+export const FICTION_COLLECTION = "fiction";
+export const NON_FICTION_COLLECTION = "non-fiction";
+export const USER_TOPICS_COLLECTION = "user_topics";
+export const TOPIC_DOC_ID = "aYFbdeK7uruChdGQ2Hy2";
+export const NOTIFICATION_COLLECTION = "notifications";
