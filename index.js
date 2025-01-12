@@ -3,13 +3,13 @@ import cors from 'cors';
 import express from 'express';
 import mongoose from 'mongoose';
 import { Server } from 'socket.io';
-import bookRoutes from './src/routes/bookrouter.js';
-import userRoutes from './src/routes/userrouter.js';
-import homeFeedRoutes from './src/routes/homerouter.js';
-import postRoutes from './src/routes/createpost.js';
-import exchangeRoutes from './src/routes/bookexchange.js';
-import notificationRoutes from './src/routes/notificationroute.js';
-import categoryRoutes from './src/routes/categoryrouter.js';
+import bookRoutes from './src/routes/bookRouter.js';
+import userRoutes from './src/routes/userRouter.js';
+import homeFeedRoutes from './src/routes/homeRouter.js';
+import postRoutes from './src/routes/createPost.js';
+import exchangeRoutes from './src/routes/bookExchange.js';
+import notificationRoutes from './src/routes/notificationRoute.js';
+import categoryRoutes from './src/routes/categoryRouter.js';
 
 const app = express();
 

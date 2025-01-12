@@ -1,5 +1,5 @@
 env: standard
-runtime: nodejs18
+runtime: nodejs20
 runtime_config:
     operating_system: "ubuntu22"
 # automatic_scaling:
