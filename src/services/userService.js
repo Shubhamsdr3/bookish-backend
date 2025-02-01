@@ -10,14 +10,15 @@ export const userService = {
 
     async createUser(userData) {
         try {
-            const userDoc = userCollection.doc();
+            console.log("Creating user:  " + user._id);
+            const userDoc = userCollection.doc(user._id);
             const jwtToken = jwt.sign(
                 { userId: user._id }, 
                 process.env.JWT_SECRET,
-                { expiresIn: '1h' }
+                { expiresIn: '24h' }
             );
             userData.authToken = jwtToken;
-            await userDoc.set(userData);
+            await userDoc.set({userData}, {merge: true});
             return {
                 isSuccess: true,
                 data: userDoc.data()
@@ -65,6 +66,8 @@ export const userService = {
                 process.env.JWT_SECRET,
                 { expiresIn: '24h' }
             );
+
+            console.log("Creating user for: " + userDoc.id);
 
             const newUser = {
                 userId: userDoc.id,

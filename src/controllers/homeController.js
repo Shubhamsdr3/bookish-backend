@@ -4,10 +4,24 @@ export const homeController = {
 
     async getHomeFeed(req, res) {
         try {
-            const feedData = await feedService.getFeed(req, res);
-            res.status(200).json(feedData);
+            // Access query params with default values
+            const page = parseInt(req.query.page) || 1;
+            const limit = parseInt(req.query.limit) || 10;
+            
+            console.log(`Page: ${page}, Limit: ${limit}`);
+            
+            const result = await feedService.getFeed(page, limit);
+            
+            if (result.isSuccess) {
+                res.status(200).json(result);
+            } else {
+                res.status(400).json(result);
+            }
         } catch (error) {
-            res.status(400).json({ error: error.message });
+            res.status(500).json({
+                isSuccess: false,
+                error: error.message
+            });
         }
     },
 

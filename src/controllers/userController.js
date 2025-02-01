@@ -22,9 +22,9 @@ export const userController = {
     async getProfile(req, res) {
         try {
             const user = await userService.getUserById(req.query.userId);
-            res.status(200).json({"isSuccess": true, "data": user});
+            res.status(200).json(user);
         } catch (error) {
-            res.status(404).json({ "isSuccess": false,  "error": error.message });
+            res.status(404).json({error : error.message});
         }
     },
 
