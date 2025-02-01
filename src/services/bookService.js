@@ -1,6 +1,4 @@
 import axios from 'axios';
-import { firestoreDB } from '../utils/init.js';
-
 
 const apiKey = process.env.GOOGLE_BOOK_KEY;
 
