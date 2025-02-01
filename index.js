@@ -10,6 +10,7 @@ import postRoutes from './src/routes/createPost.js';
 import exchangeRoutes from './src/routes/bookExchange.js';
 import notificationRoutes from './src/routes/notificationRoute.js';
 import categoryRoutes from './src/routes/categoryRouter.js';
+import { apiLimiter, authLimiter, feedLimiter } from './src/middleware/rateLimiter.js';
 
 const app = express();
 
@@ -29,15 +30,22 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // Routes
+app.use('/api/', apiLimiter);
+
 app.use('/api/bookish', [
     userRoutes,
-    homeFeedRoutes,
+    homeFeedRoutes.use(feedLimiter),
     postRoutes,
     bookRoutes,
     exchangeRoutes,
     notificationRoutes,
     categoryRoutes
 ]);
+
+// Apply stricter limits to auth routes
+app.use('/api/bookish/login', authLimiter);
+app.use('/api/bookish/register', authLimiter);
+
 // Test endpoint for headers
 app.get('/api/test-auth', (req, res) => {
     console.log('Headers received:', {

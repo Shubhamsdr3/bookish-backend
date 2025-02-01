@@ -2,11 +2,12 @@ import { Router } from 'express';
 import { userController } from '../controllers/userController.js';
 import { verifyToken } from '../middleware/auth.js';
 import { logout } from '../middleware/auth.js';
+import { authLimiter } from '../middleware/rateLimiter.js';
 
 const router = Router();
 
-router.post('/register', userController.register);
-router.post('/login', userController.login);
+router.post('/register', authLimiter, userController.register);
+router.post('/login', authLimiter, userController.login);
 router.get('/profile', verifyToken, userController.getProfile);
 router.put('/profile', verifyToken, userController.updateProfile);
 router.post('/feedback', verifyToken, userController.addFeedback);
