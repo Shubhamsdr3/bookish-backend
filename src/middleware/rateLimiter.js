@@ -35,7 +35,7 @@ export const authLimiter = rateLimit({
 // Feed endpoints limiter
 export const feedLimiter = rateLimit({
     windowMs: 5 * 60 * 1000, // 5 minutes
-    max: 1, // 1 request per 5 minutes
+    max: 100, // 1 request per 5 minutes
     message: {
         isSuccess: false,
         error: 'Too many feed requests, please try again later.'
