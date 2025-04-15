@@ -9,5 +9,5 @@ export const TOPICS_COLLECTION = "topics";
 export const FICTION_COLLECTION = "fiction";
 export const NON_FICTION_COLLECTION = "non-fiction";
 export const USER_TOPICS_COLLECTION = "user_topics";
-export const TOPIC_DOC_ID = "aYFbdeK7uruChdGQ2Hy2";
+export const TOPIC_DOC_ID = "QYBKyLsw2DTd6AwZk70q";
 export const NOTIFICATION_COLLECTION = "notifications";
