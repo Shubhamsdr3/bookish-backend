@@ -54,7 +54,7 @@ export const exchangeService = {
     },
 
     async getExchangeFriends(req) {
-        const currentUserId = req.params.userId;
+        const currentUserId = req.query['userId'];
         console.log("Getting friends for user: " + currentUserId);
         if(!currentUserId) {
             return {
@@ -63,28 +63,11 @@ export const exchangeService = {
             }
         } else {
             try {
-                const friendUsers = [];
-                const snapShot = await chatUserCollection.doc(currentUserId).collection(FRIENDS_COLLECTION).orderBy('updatedAt', 'desc').get();
-                await Promise.all(
-                    snapShot.docs.map(async (doc) => {
-                        console.log("Document info: " + JSON.stringify(doc.data()));
-                        const freind = doc.data();
-                        console.log("Friend id: " + freind.friendId)
-                        const freindUserSnapshot = await readerCollection.doc(freind.friendId).get();
-                        const currentUserSnapShot = await readerCollection.doc(currentUserId).get();
-                        const jsonResponse = JSON.stringify(freindUserSnapshot.data());
-                        console.log("Friend detail " + jsonResponse)
-                        friendUsers.push({
-                            'friend': freindUserSnapshot.data(),
-                            'currentUser': currentUserSnapShot.data(),
-                            'channelId': freind.channelId,
-                            'updatedAt': freind.updatedAt
-                        });
-                    })
-                )
+                const snapShot = await chatUserCollection.doc(currentUserId).get();
+                const friends = snapShot.data();
                 return {
                     isSuccess: true,
-                    data: friendUsers
+                    data: friends
                 }
             } catch(err) {
                 console.log(err);

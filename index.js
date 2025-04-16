@@ -11,6 +11,7 @@ import exchangeRoutes from './src/routes/bookExchange.js';
 import notificationRoutes from './src/routes/notificationRoute.js';
 import categoryRoutes from './src/routes/categoryRouter.js';
 import { apiLimiter, authLimiter, feedLimiter } from './src/middleware/rateLimiter.js';
+import { socketService } from './src/services/socketService.js';
 
 const app = express();
 
@@ -72,7 +73,7 @@ mongoose.connect(process.env.MONGO_URL, {
 
 // HTTP Server
 const PORT = process.env.PORT || 3000;
-const httpServer = app.listen(PORT, () => {
+app.listen(PORT, () => {
     console.log(`HTTP Server running on port ${PORT}`);
 });
 
@@ -82,12 +83,16 @@ const wsServer = app.listen(SOCKET_PORT, () => {
     console.log(`WebSocket Server running on port ${SOCKET_PORT}`);
 });
 
-const io = new Server(wsServer);
+// Initialize socket service
+socketService.initialize(wsServer);
 
-io.on('connection', (socket) => {
-    console.log(`New connection: ${socket.id}`);
-    socket.emit('notification', 'Thanks for connecting to Bookish!');
-});
+// Example of starting a continuous event emission
+// This will emit a 'systemStatus' event every 30 seconds
+socketService.startContinuousEmission('systemStatus', 1000, () => ({
+    timestamp: new Date().toISOString(),
+    status: 'operational',
+    activeUsers: socketService.connectedUsers.size
+}));
 
 // Add error handling middleware
 app.use((err, req, res, next) => {

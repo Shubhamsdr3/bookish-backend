@@ -2,6 +2,7 @@ import { firestoreDB } from '../utils/init.js';
 import jwt from 'jsonwebtoken';
 import Token from '../models/token.js';
 import { READER_COLLECTION, FEEDBACK_COLLECTION } from '../utils/constants.js';
+import e from 'express';
 
 const userCollection = firestoreDB.collection(READER_COLLECTION);
 const feedbackCollection = firestoreDB.collection(FEEDBACK_COLLECTION);
@@ -66,9 +67,23 @@ export const userService = {
                 process.env.JWT_SECRET,
                 { expiresIn: '24h' }
             );
-
+        
+            // check if user already exists.
+            console.log("checking if user already exists: " + userData.phoneNumber);
+            const userInfo = await this.checkIfUserExists(userData.phoneNumber);
+            if(userInfo && userInfo['exists']) {
+                const userResponse = userInfo['userData'];
+                userResponse['isNewUser'] = false;
+                return {
+                    isSuccess: true,
+                    data: {
+                        "token": token,
+                        "user": userResponse
+                    }
+                };
+            }
+            // create new user.
             console.log("Creating user for: " + userDoc.id);
-
             const newUser = {
                 userId: userDoc.id,
                 userName: userData.userName,
@@ -79,6 +94,7 @@ export const userService = {
                 privacy: userData.privacy || 0,
                 phoneNumber: userData.phoneNumber,
                 readingStatus: userData.userStatus || 'active',
+                isNewUser: true
             };
         
             await userDoc.set(newUser);
@@ -95,6 +111,34 @@ export const userService = {
             return {
                 isSuccess: false,
                 message: error.message
+            };
+        }
+    },
+
+    async checkIfUserExists(phoneNumber) {
+        try {
+            const querySnapshot = await userCollection
+                .where('phoneNumber', '==', phoneNumber)
+                .get();
+
+            if (querySnapshot.empty) {
+                return {
+                    exists: false,
+                    userData: null
+                };
+            }
+
+            const userData = querySnapshot.docs[0].data();
+            return {
+                exists: true,
+                userData: userData
+            };
+        } catch (error) {
+            console.error("Error checking if user exists:", error);
+            return {
+                exists: false,
+                userData: null,
+                error: error.message
             };
         }
     },
@@ -143,6 +187,10 @@ export const userService = {
 
     async logoutUser(token) {
         try {
+            if (!token) {
+                throw new Error('Token is required for logout');
+            }
+            
             // Invalidate current token
             await Token.findOneAndUpdate(
                 { token: req.token },
