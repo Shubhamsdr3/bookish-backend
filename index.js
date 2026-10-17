@@ -1,7 +1,6 @@
 import 'dotenv/config';
 import cors from 'cors';
 import express from 'express';
-import mongoose from 'mongoose';
 import { Server } from 'socket.io';
 import bookRoutes from './src/routes/bookRouter.js';
 import userRoutes from './src/routes/userRouter.js';
@@ -61,15 +60,15 @@ app.get('/api/test-auth', (req, res) => {
     });
 });
 
-// Database connection
-mongoose.connect(process.env.MONGO_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then(() => {
-    console.log('Connected to Database');
-}).catch((err) => {
-    console.error('Database connection error:', err);
-});
+// MongoDB is only used to invalidate logout tokens. Firestore holds the app data.
+// mongoose.connect(process.env.MONGO_URL, {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true
+// }).then(() => {
+//     console.log('Connected to Database');
+// }).catch((err) => {
+//     console.error('Database connection error:', err);
+// });
 
 // HTTP Server
 const PORT = process.env.PORT || 3000;

@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import Token from '../models/token.js';
+// import Token from '../models/token.js';
 
 export const verifyToken = async (req, res, next) => {
     try {
@@ -40,7 +40,7 @@ export const verifyToken = async (req, res, next) => {
 
 export const logout = async (req, res, next) => {
     try {
-        await Token.findOneAndUpdate({ token: req.token }, { isValid: false });
+        // await Token.findOneAndUpdate({ token: req.token }, { isValid: false });
         next();
     } catch (error) {
         console.error('Logout failed:', error);

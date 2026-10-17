@@ -1,6 +1,7 @@
 import { firestoreDB } from '../utils/init.js';
+import firebaseAdmin from 'firebase-admin';
 import jwt from 'jsonwebtoken';
-import Token from '../models/token.js';
+// import Token from '../models/token.js';
 import { READER_COLLECTION, FEEDBACK_COLLECTION } from '../utils/constants.js';
 import e from 'express';
 
@@ -60,57 +61,83 @@ export const userService = {
     },
 
     async loginUser(userData) {
-        try {
-            const userDoc = userCollection.doc();
+        const verifiedPhone = await this.readVerifiedPhoneNumber(userData.idToken);
+        if (!verifiedPhone.isValid) {
+            return {
+                isSuccess: false,
+                message: verifiedPhone.message
+            };
+        }
+        const phoneNumber = verifiedPhone.phoneNumber;
+        const userInfo = await this.checkIfUserExists(phoneNumber);
+        if (userInfo && userInfo.exists) {
+            const userResponse = userInfo.userData;
+            userResponse.isNewUser = false;
             const token = jwt.sign(
-                { userId: userDoc.id },
+                { userId: userInfo.userId },
                 process.env.JWT_SECRET,
                 { expiresIn: '24h' }
             );
-        
-            // check if user already exists.
-            console.log("checking if user already exists: " + userData.phoneNumber);
-            const userInfo = await this.checkIfUserExists(userData.phoneNumber);
-            if(userInfo && userInfo['exists']) {
-                const userResponse = userInfo['userData'];
-                userResponse['isNewUser'] = false;
-                return {
-                    isSuccess: true,
-                    data: {
-                        "token": token,
-                        "user": userResponse
-                    }
-                };
-            }
-            // create new user.
-            console.log("Creating user for: " + userDoc.id);
-            const newUser = {
-                userId: userDoc.id,
-                userName: userData.userName,
-                name: userData.name,
-                profileIcon: userData.profileIcon || '',
-                connections: userData.connections || 0,
-                createdAt: Date.now(),
-                privacy: userData.privacy || 0,
-                phoneNumber: userData.phoneNumber,
-                readingStatus: userData.userStatus || 'active',
-                isNewUser: true
-            };
-        
-            await userDoc.set(newUser);
-            console.log("User Info: " + JSON.stringify(newUser));
             return {
                 isSuccess: true,
                 data: {
-                    "token": token,
-                    "user": newUser
+                    token: token,
+                    user: userResponse
                 }
             };
-        } catch (error) {
-            console.error("Error in login:", error);
+        }
+        const userDoc = userCollection.doc();
+        const token = jwt.sign(
+            { userId: userDoc.id },
+            process.env.JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+        const newUser = {
+            userId: userDoc.id,
+            userName: userData.userName,
+            name: userData.name,
+            profileIcon: userData.profileIcon || '',
+            connections: userData.connections || 0,
+            createdAt: Date.now(),
+            privacy: userData.privacy || 0,
+            phoneNumber: phoneNumber,
+            readingStatus: userData.userStatus || 'active',
+            isNewUser: true
+        };
+        await userDoc.set(newUser);
+        return {
+            isSuccess: true,
+            data: {
+                token: token,
+                user: newUser
+            }
+        };
+    },
+
+    async readVerifiedPhoneNumber(idToken) {
+        if (!idToken) {
             return {
-                isSuccess: false,
-                message: error.message
+                isValid: false,
+                message: 'Firebase ID token is required'
+            };
+        }
+        try {
+            const decoded = await firebaseAdmin.auth().verifyIdToken(idToken);
+            if (!decoded.phone_number) {
+                return {
+                    isValid: false,
+                    message: 'Phone number is missing from the Firebase token'
+                };
+            }
+            return {
+                isValid: true,
+                phoneNumber: decoded.phone_number
+            };
+        } catch (error) {
+            console.error('Firebase token verification failed:', error);
+            return {
+                isValid: false,
+                message: 'Invalid Firebase token'
             };
         }
     },
@@ -128,9 +155,11 @@ export const userService = {
                 };
             }
 
-            const userData = querySnapshot.docs[0].data();
+            const userDoc = querySnapshot.docs[0];
+            const userData = userDoc.data();
             return {
                 exists: true,
+                userId: userData.userId || userDoc.id,
                 userData: userData
             };
         } catch (error) {
@@ -143,14 +172,17 @@ export const userService = {
         }
     },
 
-    async updateUser(updateData) {
+    async updateUser(userId, updateData) {
         try {
-            const userId = updateData['userId'];
             if (!userId) {
                 throw new Error("User ID not valid");
             }
+            const fields = { ...updateData };
+            delete fields.userId;
+            delete fields.phoneNumber;
+            const payload = { ...fields, userId };
 
-            await userCollection.doc(userId).set(updateData, { merge: true });
+            await userCollection.doc(userId).set(payload, { merge: true });
             const updatedDoc = await userCollection.doc(userId).get();
 
             return {
@@ -192,10 +224,10 @@ export const userService = {
             }
             
             // Invalidate current token
-            await Token.findOneAndUpdate(
-                { token: req.token },
-                { isValid: false }
-            );
+            // await Token.findOneAndUpdate(
+            //     { token: req.token },
+            //     { isValid: false }
+            // );
     
             return { 
                 isSuccess: true,

@@ -13,9 +13,9 @@ export const postController = {
     async deletePost(req, res) {
         try {
             const response = await postService.deletePost(req);
-            res.status(200).json(response);
+            return res.status(response.statusCode || 200).json(response);
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ error: error.message });
         }
     }
 }

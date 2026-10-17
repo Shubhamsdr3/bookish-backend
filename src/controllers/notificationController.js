@@ -2,29 +2,21 @@ import { notificationService } from '../services/notificationService.js';
 
 export const notificationController = {
     async sendNotification(req, res) {
-        try {
-            const response = await notificationService.sendNotification(req);
-            res.status(200).json(response);
-        } catch (error) {
-            res.status(500).json({ error: error.message });
-        }
+        const response = await notificationService.sendNotification();
+        return res.status(response.statusCode).json(response);
     },
 
     async sendNotificationTopic(req, res) {
-      try {
-        const response = await notificationService.sendNotificationTopic(req);
-        res.status(200).json(response);
-      } catch (error) {
-        res.status(500).json({ error: error.message });
-      }
+        const response = await notificationService.sendNotificationTopic();
+        return res.status(response.statusCode).json(response);
     },
 
     async subscribeTopic(req, res) {
-        try {   
+        try {
             const response = await notificationService.subscribeTopic(req);
-            res.status(200).json(response);
+            return res.status(response.statusCode).json(response);
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ error: error.message });
         }
     }
 }

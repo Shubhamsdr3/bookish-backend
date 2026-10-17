@@ -8,7 +8,7 @@ const readerCollection = firestoreDB.collection(READER_COLLECTION)
 export const postService = {
 
     async createPost(req) {
-        const userId = req.body.userId;
+        const userId = req.user && req.user.userId;
         const previousPost = req.body.post;
         if(!userId || !previousPost) {
             return {        
@@ -68,25 +68,44 @@ export const postService = {
 
     async deletePost(req) {
         const postId = req.params.postId;
-        console.log("Deleting post: " + postId);
-        if(!postId) {
+        const userId = req.user && req.user.userId;
+        if (!postId || !userId) {
             return {
                 isSuccess: false,
+                statusCode: 400,
                 data: "Not a valid postId"
-            }
-        } else {
-            try {
-                await postCollection.doc(postId).delete();
-                return {
-                    isSuccess: true,
-                    data: "Post deleted"
-                }
-            } catch(error) {
+            };
+        }
+        try {
+            const postDoc = await postCollection.doc(postId).get();
+            if (!postDoc.exists) {
                 return {
                     isSuccess: false,
-                    data: error
-                }
+                    statusCode: 404,
+                    data: "Post not found"
+                };
             }
+            const reader = postDoc.data().reader || {};
+            const ownerId = reader.userId;
+            if (ownerId !== userId) {
+                return {
+                    isSuccess: false,
+                    statusCode: 403,
+                    data: "You can only delete your own post"
+                };
+            }
+            await postCollection.doc(postId).delete();
+            return {
+                isSuccess: true,
+                statusCode: 200,
+                data: "Post deleted"
+            };
+        } catch (error) {
+            return {
+                isSuccess: false,
+                statusCode: 400,
+                data: "Error deleting post"
+            };
         }
     },
 

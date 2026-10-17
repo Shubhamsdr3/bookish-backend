@@ -12,28 +12,41 @@ export const userController = {
 
     async login(req, res) {
         try {
-            const { data } = await userService.loginUser(req.body);
-            res.status(200).json({"isSuccess": true, "data": data});
+            const result = await userService.loginUser(req.body);
+            if (!result.isSuccess) {
+                return res.status(401).json({ isSuccess: false, error: result.message });
+            }
+            return res.status(200).json({ isSuccess: true, data: result.data });
         } catch (error) {
-            res.status(401).json({ "isSuccess": false, "error": error.message });
+            return res.status(401).json({ isSuccess: false, error: 'Login failed' });
         }
     },
 
     async getProfile(req, res) {
         try {
-            const user = await userService.getUserById(req.query.userId);
-            res.status(200).json(user);
+            const requestedUserId = req.query.userId || req.user.userId;
+            const user = await userService.getUserById(requestedUserId);
+            if (!user.isSuccess) {
+                return res.status(404).json({ error: user.message });
+            }
+            if (requestedUserId !== req.user.userId && user.data) {
+                delete user.data.phoneNumber;
+            }
+            return res.status(200).json(user);
         } catch (error) {
-            res.status(404).json({error : error.message});
+            return res.status(404).json({ error: error.message });
         }
     },
 
     async updateProfile(req, res) {
         try {
-            const user = await userService.updateUser(req.body);
-            res.status(200).json({"isSuccess": true, "data": user});
+            const user = await userService.updateUser(req.user.userId, req.body);
+            if (!user.isSuccess) {
+                return res.status(400).json({ isSuccess: false, error: user.message });
+            }
+            return res.status(200).json({ isSuccess: true, data: user.data });
         } catch (error) {
-            res.status(400).json({ "isSuccess": false,"error": error.message });
+            return res.status(400).json({ isSuccess: false, error: error.message });
         }
     },
 
