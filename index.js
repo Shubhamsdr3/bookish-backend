@@ -60,6 +60,17 @@ app.get('/api/test-auth', (req, res) => {
     });
 });
 
+app.use((err, req, res, next) => {
+    const status = err.status || 500;
+    if (status >= 500) {
+        console.error('Error:', err);
+    }
+    res.status(status).json({
+        message: err.message || 'Internal Server Error',
+        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
+});
+
 // MongoDB is only used to invalidate logout tokens. Firestore holds the app data.
 // mongoose.connect(process.env.MONGO_URL, {
 //     useNewUrlParser: true,
@@ -92,14 +103,5 @@ socketService.startContinuousEmission('systemStatus', 1000, () => ({
     status: 'operational',
     activeUsers: socketService.connectedUsers.size
 }));
-
-// Add error handling middleware
-app.use((err, req, res, next) => {
-    console.error('Error:', err);
-    res.status(err.status || 500).json({
-        message: err.message || 'Internal Server Error',
-        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
-    });
-});
 
 export default app;
